@@ -17,7 +17,6 @@ const router = createBrowserRouter([
   { path: "/manager/sign-in", element: <SigninPage /> },
   { path: "/manager/sign-up", element: <SignupPage /> },
   { path: "/manager/success-checkout", element: <SuccessCheckoutPage /> },
-  { path: "/manager/success-checkout", element: <SuccessCheckoutPage /> },
   {
     path: "/manager",
     element: <LayoutDashboard />,

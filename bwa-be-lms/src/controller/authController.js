@@ -1,34 +1,69 @@
 import bcrypt from "bcrypt";
 import userModel from "../models/userModel.js";
+import transactionModel from "../models/transactionModel.js";
 
 export const signUpAction = async (req, res) => {
-    try {
-        const body = req.body; //name, email, password
 
-        const hashPassword = await bcrypt.hash(body.password, 12)
+    const midtransUrl = process.env.MIDTRANS_URL;
+    const midtransAuthString = process.env.MIDTRANS_AUTH_STRING;
 
-        const user = new userModel({
-            name: body.name,
-            email: body.email,
-            password: hashPassword,
-            foto: 'default.jpg',
-            role: 'manager',
-        });
+  try {
+    const body = req.body; //name, email, password
 
-        // action payment gateway midtrans
+    const hashPassword = await bcrypt.hash(body.password, 12);
 
-        await user.save();
+    const user = new userModel({
+      name: body.name,
+      email: body.email,
+      password: hashPassword,
+      foto: "default.jpg",
+      role: "manager",
+    });
 
-        return res.json({
-            message: 'success',
-            data: {
-                midtrans_payment_url: 'https://google.com'
-            } 
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            message: 'internal server error'
-        })
-    }
-}
+    // action payment gateway midtrans
+    const transaction = new transactionModel({ 
+        user: user._id,
+        price: 250000
+    });
+
+    const midtrans = await fetch(midtransUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+            transaction_details: {
+                order_id: transaction._id.toString(),
+                gross_amount: transaction.price
+            },
+            credit_card:{
+                secure : true
+            },
+            customer_details: {
+                email: user.email,
+            },
+            callbacks: {
+                finish: 'http://localhost:5173/manager/success-checkout'
+            }
+        }),
+        headers: {
+            'content-type': 'application/json',
+            authorization: `Basic ${midtransAuthString}`
+        } 
+    });
+
+    const resMidtrans = await midtrans.json();
+
+    await user.save();
+    await transaction.save();
+
+    return res.json({
+      message: "success",
+      data: {
+        midtrans_payment_url: resMidtrans.redirect_url
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
