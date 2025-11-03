@@ -16,7 +16,7 @@ const SignupPage = () => {
   });
 
   const handleOnSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     setDataSignUp(data);
     setMode('PRICING');
   }

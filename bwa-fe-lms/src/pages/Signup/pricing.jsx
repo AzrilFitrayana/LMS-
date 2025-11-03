@@ -1,20 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import {useMutation} from '@tanstack/react-query';
+import { useMutation } from "@tanstack/react-query";
 import { postSignUp } from "../../services/authServices";
 
 const Pricing = ({ data }) => {
+  const { isLoading, mutateAsync } = useMutation({
+    mutationFn: () => postSignUp(data),
+  });
 
-  const {isLoading, mutateAsync} = useMutation({
-    mutationFn: () => postSignUp(data)
-  })
-
-  console.log(data);
+  // console.log(data);
 
   const submitData = async () => {
     try {
-      if(!data) return;
+      if (!data) return;
 
       const response = await mutateAsync();
 
@@ -22,7 +21,7 @@ const Pricing = ({ data }) => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <div className="relative flex flex-col flex-1 p-[10px] min-h-screen">
