@@ -5,3 +5,5 @@ export const signupSchema = z.object({
     email: z.email(),
     password: z.string().min(5)
 })
+
+export const signinSchema = signupSchema.omit({name: true});
