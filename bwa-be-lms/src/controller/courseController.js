@@ -187,29 +187,48 @@ export const updateCourse = async (req, res) => {
 };
 
 export const deleteCourse = async (req, res) => {
-    try {
-        const {id} = req.params
+  try {
+    const { id } = req.params;
 
-        const course = await courseModel.findById(id)
+    const course = await courseModel.findById(id);
 
-        const dirname = path.resolve()
+    const dirname = path.resolve();
 
-        const filePath = path.join(dirname, 'public/uploads/courses', course.thumbnail)
+    const filePath = path.join(
+      dirname,
+      "public/uploads/courses",
+      course.thumbnail
+    );
 
-        if(fs.existsSync(filePath)){
-            fs.unlinkSync(filePath)
-        }
-
-        await courseModel.findByIdAndDelete(id)
-
-        return res.json({
-            message: 'Delete course success'
-        })
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            message: 'Internal server error'
-        })
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
     }
-}
+
+    await courseModel.findByIdAndDelete(id);
+
+    return res.json({
+      message: "Delete course success",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getCategories = async (req, res) => {
+  try {
+    const categories = await categoryModel.find();
+
+    return res.json({
+      message: "Get Categories Success",
+      data: categories,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
