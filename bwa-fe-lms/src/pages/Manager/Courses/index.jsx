@@ -1,8 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import CardCourse from "./Card";
 
 const ManageCoursePage = () => {
+
+  const courses =  useLoaderData()//untuk mengambil data loader di route
+  // console.log(courses)
+
+
+
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -33,7 +39,11 @@ const ManageCoursePage = () => {
         id="CourseList"
         className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
-        <CardCourse />    
+        {
+          courses?.data?.map((item) => (
+            <CardCourse key={item._id} category={item.category.name} id={item._id} imageUrl={item.thumbnail_url} name={item.name} totalStudent={item.total_students} />    
+          ))
+        }
 
         <div id="Pagination" className="flex items-center gap-3">
           <button

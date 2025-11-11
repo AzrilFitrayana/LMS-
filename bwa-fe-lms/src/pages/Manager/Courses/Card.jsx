@@ -54,11 +54,11 @@ const CardCourse = ({
 };
 
 CardCourse.propTypes = {
-    id: PropTypes.number,
-    imageUrl: PropTypes.string,
-    name: PropTypes.string,
-    totalStudent: PropTypes.string,
-    category: PropTypes.string,
+  id: PropTypes.number,
+  imageUrl: PropTypes.string,
+  name: PropTypes.string,
+  totalStudent: PropTypes.string,
+  category: PropTypes.string,
 };
 
 export default CardCourse;
