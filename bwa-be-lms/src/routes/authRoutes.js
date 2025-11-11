@@ -2,6 +2,7 @@ import express from "express";
 import { validateRequest } from "../middleware/validateRequest.js";
 import { signinSchema, signupSchema } from "../utils/schema.js";
 import { signInAction, signUpAction } from "../controller/authController.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 const authRoutes = express.Router();
 
