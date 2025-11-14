@@ -321,17 +321,39 @@ export const updateContentCourse = async (req, res) => {
       });
     }
 
-    await courseDetailModel.findByIdAndUpdate(contentId, {
-      title: body.title,
-      type: body.type,
-      course: course._id,
-      text: body.text,
-      youtubeId: body.youtubeId,
-    }, {new: true});
+    await courseDetailModel.findByIdAndUpdate(
+      contentId,
+      {
+        title: body.title,
+        type: body.type,
+        course: course._id,
+        text: body.text,
+        youtubeId: body.youtubeId,
+      },
+      { new: true }
+    );
 
     return res.status(200).json({
       message: "Update content success",
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const deleteContentCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await courseDetailModel.findByIdAndDelete(id)
+
+    return res.status(200).json({
+      message: "Delete content success",
+    });
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({

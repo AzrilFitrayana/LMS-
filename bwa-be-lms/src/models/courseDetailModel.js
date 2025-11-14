@@ -19,12 +19,15 @@ const courseDetailModel = new mongoose.Schema(
   { timestamps: true }
 );
 
-// courseDetailModel.post("findOneAndDelete", async (doc) => {
-//   if (doc) {
-//     await courseModel.findByIdAndUpdate(doc.course, {
-//       $pull: doc._id,
-//     });
-//   }
-// });
+courseDetailModel.post("findOneAndDelete", async (doc) => {
+  if (doc) {
+    // update courseModel berdasarkan id dari document.course yang dihapus, hapus data details di courseModel berdasarkan document.id yang sama pada detailModel yang dihapus
+    await courseModel.findByIdAndUpdate(doc.course, {
+      $pull: {
+        details: doc._id,
+      },
+    });
+  }
+});
 
 export default mongoose.model("CourseDetail", courseDetailModel);
