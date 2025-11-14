@@ -1,4 +1,4 @@
-import { deleteCourse, getCategories, getCourse, getCourseById, postContentCourse, postCourse, updateCourse } from '../controller/courseController.js'
+import { deleteCourse, getCategories, getCourse, getCourseById, postContentCourse, postCourse, updateContentCourse, updateCourse } from '../controller/courseController.js'
 import { validateRequest } from "../middleware/validateRequest.js";
 import { fileStorageCourse, fileFilter } from '../utils/multer.js'
 import { verifyToken } from '../middleware/verifyToken.js'
@@ -23,6 +23,7 @@ courseRoutes.get('/categories', verifyToken, getCategories)
 
 //content
 courseRoutes.post('/courses/contents', verifyToken, validateRequest(mutateContentSchema), postContentCourse);
+courseRoutes.put('/courses/contents/:id', verifyToken, validateRequest(mutateContentSchema), updateContentCourse);
 
 
 export default courseRoutes

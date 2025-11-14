@@ -269,7 +269,6 @@ export const getCategories = async (req, res) => {
   }
 };
 
-
 //Content Course
 
 export const postContentCourse = async (req, res) => {
@@ -300,6 +299,38 @@ export const postContentCourse = async (req, res) => {
 
     return res.status(200).json({
       message: "Create content success",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const updateContentCourse = async (req, res) => {
+  try {
+    const body = req.body;
+    const contentId = req.params.id;
+
+    const course = await courseModel.findById(body.courseId);
+
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
+    }
+
+    await courseDetailModel.findByIdAndUpdate(contentId, {
+      title: body.title,
+      type: body.type,
+      course: course._id,
+      text: body.text,
+      youtubeId: body.youtubeId,
+    }, {new: true});
+
+    return res.status(200).json({
+      message: "Update content success",
     });
   } catch (error) {
     console.log(error);
