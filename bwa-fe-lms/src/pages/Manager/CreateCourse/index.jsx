@@ -1,44 +1,64 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
-import { createCourseSchema } from "../../../utils/zodSchema";
+import { Link, useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { createCourseSchema, updateCourseSchema } from "../../../utils/zodSchema";
 import { useMutation } from "@tanstack/react-query";
-import { createCourse } from "../../../services/courseServices";
+import { createCourse, updateCourse } from "../../../services/courseServices";
 
 const CreateCourse = () => {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const inputFileRef = useRef(null);
-  const categories = useLoaderData();
-  // console.log(categories)
+  const data = useLoaderData();
+  const { id } = useParams();
 
+  console.info(data);
+
+  //react-form
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
   } = useForm({
-    resolver: zodResolver(createCourseSchema),
+    resolver: zodResolver(data.course === null ? createCourseSchema : updateCourseSchema),
+    defaultValues: {
+      name: data?.course?.name,
+      tagline: data?.course?.tagline,
+      categoryId: data?.course?.category,
+      description: data?.course?.description,
+    },
   });
 
-  const { isLoading, mutateAsync } = useMutation({
+  //react-query create
+  const mutateCreate = useMutation({
     mutationFn: (data) => createCourse(data),
   });
 
-  const handleOnSubmit = async (data) => {
-    console.log(data);
+  //react-query update
+  const mutateUpdate = useMutation({
+    mutationFn: (data) => updateCourse(data, id),
+  });
+
+  //handel submit data
+  const handleOnSubmit = async (values) => {
+    // console.log(data);
 
     try {
       const formData = new FormData();
 
-      formData.append("name", data.name);
+      formData.append("name", values.name);
       formData.append("thumbnail", file);
-      formData.append("tagline", data.tagline);
-      formData.append("categoryId", data.categoryId);
-      formData.append("description", data.description);
+      formData.append("tagline", values.tagline);
+      formData.append("categoryId", values.categoryId);
+      formData.append("description", values.description);
 
-      await mutateAsync(formData);
+      if (data.course === null) {
+        await mutateCreate.mutateAsync(formData);
+      } else {
+        await mutateUpdate.mutateAsync(formData);
+      }
 
       navigate("/manager/courses");
     } catch (error) {
@@ -191,7 +211,7 @@ const CreateCourse = () => {
               <option value="" hidden="">
                 Choose one category
               </option>
-              {categories?.data?.map((item) => (
+              {data?.categories?.data?.map((item) => (
                 <option key={item._id} value={item._id}>
                   {item.name}
                 </option>
@@ -241,10 +261,10 @@ const CreateCourse = () => {
           </button>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={data.course === null ? mutateCreate.isLoading : mutateUpdate.isLoading}
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
-            Create Now
+            {data.course === null ? 'Create Now' : 'Update Now'}
           </button>
         </div>
       </form>

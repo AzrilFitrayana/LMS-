@@ -1,8 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import TableContent from "./TableContent";
 
 const ManageCourseDetailPage = () => {
+
+  const {id} = useParams()
+
   return (
     <>
       <div
@@ -28,7 +31,7 @@ const ManageCourseDetailPage = () => {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            to="#"
+            to={`/manager/courses/edit/${id}`}
             className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
           >
             Edit Course

@@ -1,9 +1,10 @@
+import { mutateCourseSchema } from "../utils/schema.js";
 import courseModel from "../models/courseModel.js";
 import categoryModel from "../models/categoryModel.js";
-import { mutateCourseSchema } from "../utils/schema.js";
-import fs from "fs";
 import userModel from "../models/userModel.js";
 import path from "path";
+import fs from "fs";
+const uploadDir = "public/uploads/courses";
 
 export const getCourse = async (req, res) => {
   //   console.log(req);
@@ -125,6 +126,24 @@ export const postCourse = async (req, res) => {
   }
 };
 
+export const getCourseById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const course = await courseModel.findById(id);
+
+    return res.json({
+      message: "Get course detail success",
+      data: course,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
+
 export const updateCourse = async (req, res) => {
   try {
     const body = req.body;
@@ -149,8 +168,11 @@ export const updateCourse = async (req, res) => {
     }
 
     const category = await categoryModel.findById(parse.data.categoryId);
-
     const oldCourse = await courseModel.findById(courseId);
+    // console.log(oldCourse.thumbnail);
+
+    const newThumbnail = req.file ? req.file?.filename : oldCourse.thumbnail;
+    // console.log(newThumbnail);
 
     if (!category) {
       return res.status(500).json({
@@ -163,9 +185,21 @@ export const updateCourse = async (req, res) => {
       category: category._id,
       tagline: parse.data.tagline,
       description: parse.data.description,
-      thumbnail: req.file ? req.file?.filename : oldCourse.thumbnail,
+      thumbnail: newThumbnail,
       manager: req.user._id,
     });
+
+    // hapus gambar sebelumnya
+    if (req.file && newThumbnail !== oldCourse.thumbnail) {
+      const oldPath = path.join(uploadDir, oldCourse.thumbnail);
+      // console.log(uploadDir)
+      // console.log(oldPath)
+      // console.log(fs.existsSync(oldPath))
+
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+    }
 
     return res.json({
       message: "Update Course Success",
