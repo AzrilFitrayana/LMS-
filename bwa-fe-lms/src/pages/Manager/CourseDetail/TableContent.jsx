@@ -2,7 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import CourseItem from "./CourseItem";
 
-const TableContent = () => {
+const TableContent = ({ details, courseId }) => {
+
   return (
     <section
       id="CourseList"
@@ -11,15 +12,16 @@ const TableContent = () => {
       <div className="header flex items-center justify-between">
         <h2 className="font-bold text-[22px] leading-[33px]">Course Content</h2>
         <Link
-          to={`/manager/courses/1/create`}
+          to={`/manager/courses/${courseId}/create`}
           className="w-fit rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
         >
           Add Content
         </Link>
       </div>
 
-      <CourseItem type="video" />
-      <CourseItem type="text" />
+      {details.map((content, index) => (
+          <CourseItem key={content._id} id={content._id} type={content.type} title={content.title} index={index + 1} CourseId={courseId}  />
+      ))}
 
       <div id="Pagination" className="flex items-center gap-3">
         <button

@@ -8,6 +8,7 @@ import fs from "fs";
 
 const uploadDir = "public/uploads/courses";
 
+
 export const getCourse = async (req, res) => {
   //   console.log(req);
 
@@ -132,6 +133,7 @@ export const getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
     const {preview} = req.query;
+    const imageUrl = process.env.APP_URL + "/uploads/courses/";
 
     const course = await courseModel.findById(id)
     .populate({
@@ -145,7 +147,10 @@ export const getCourseById = async (req, res) => {
 
     return res.json({
       message: "Get course detail success",
-      data: course,
+      data: {
+        ...course.toObject(),
+        thumbnail_url: imageUrl + course.thumbnail
+      },
     });
   } catch (error) {
     console.log(error);

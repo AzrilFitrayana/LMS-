@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 const CourseItem = ({
-  id = 1,
+  id = "1",
   index = 1,
   type = "Video",
   title = "Install VSCode di Windows",
-  CourseId = 2
+  CourseId = "2"
 }) => {
   return (
     <div className="card flex items-center gap-5">
