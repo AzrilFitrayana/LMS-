@@ -3,11 +3,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { mutateContentSchema } from "../../../utils/zodSchema";
 import { useNavigate, useParams } from "react-router-dom";
-import { createContent } from "../../../services/courseServices";
+import { createContent, updateContent } from "../../../services/courseServices";
+import { useLoaderData } from "react-router-dom";
 
 const ManageContentCreatePage = () => {
-  const { id } = useParams();
+  const { id, contentId } = useParams();
   const navigate = useNavigate();
+  const load = useLoaderData();
+  // console.log(id);
+  // console.log(contentId);
 
   const {
     handleSubmit,
@@ -17,21 +21,38 @@ const ManageContentCreatePage = () => {
     watch,
   } = useForm({
     resolver: zodResolver(mutateContentSchema),
+    defaultValues: {
+      title: load?.title,
+      type: load?.type,
+      text: load?.text,
+      youtubeId: load?.youtubeId,
+    },
   });
   const type = watch("type");
 
-  const { isLoading, mutateAsync } = useMutation({
+  const mutateAsyncCreate = useMutation({
     mutationFn: (data) => createContent(data),
   });
 
+  const mutateAsyncUpdate = useMutation({
+    mutationFn: (data) => updateContent(data, contentId),
+  });
+
   const onSubmit = async (values) => {
-    console.log(values);
+    // console.log(values);
 
     try {
-      await mutateAsync({
-        ...values,
-        courseId: id,
-      });
+      if (load === undefined) {
+        await mutateAsyncCreate.mutateAsync({
+          ...values,
+          courseId: id,
+        });
+      } else {
+        await mutateAsyncUpdate.mutateAsync({
+          ...values,
+          courseId: id,
+        });
+      }
 
       navigate(`/manager/courses/${id}`);
     } catch (error) {
@@ -52,7 +73,7 @@ const ManageContentCreatePage = () => {
           Course
         </span>
         <span className="last-of-type:after:content-[''] last-of-type:font-semibold">
-          Add Content
+          {load === null ? "Add" : "Update"} Content
         </span>
       </div>
       <header className="flex items-center justify-between gap-[30px]">
@@ -66,7 +87,7 @@ const ManageContentCreatePage = () => {
           </div>
           <div>
             <h1 className="font-extrabold text-[28px] leading-[42px]">
-              Add Content
+              {load === null ? "Add" : "Update"} Content
             </h1>
             <p className="text-[#838C9D] mt-[1]">
               Give a best content for the course
@@ -197,11 +218,15 @@ const ManageContentCreatePage = () => {
             Save as Draft
           </button>
           <button
-            disabled={isLoading}
+            disabled={
+              load === undefined
+                ? mutateAsyncCreate.isLoading
+                : mutateAsyncUpdate.isLoading
+            }
             type="submit"
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
-            Add Content Now
+            {load === undefined ? "Add Content Now" : "Update Content Now"}
           </button>
         </div>
       </form>

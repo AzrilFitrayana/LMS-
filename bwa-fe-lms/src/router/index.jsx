@@ -14,6 +14,7 @@ import StudentPage from "../pages/Student";
 import secureLocalStorage from "react-secure-storage";
 import { MANAGER_SESSION, STORAGE_KEY } from "../utils/const";
 import {
+  detailContent,
   getCategories,
   getCourse,
   getDetailCourse,
@@ -86,6 +87,16 @@ const router = createBrowserRouter([
       },
       {
         path: "/manager/courses/:id/create",
+        element: <ManageContentCreatePage />,
+      },
+      {
+        path: "/manager/courses/:id/edit/:contentId",
+        loader: async ({ params }) => {
+          const content = await detailContent(params.contentId);
+          // console.log(content);
+
+          return content?.data;
+        },
         element: <ManageContentCreatePage />,
       },
       {

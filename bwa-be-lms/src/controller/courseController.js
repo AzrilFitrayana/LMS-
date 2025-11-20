@@ -8,7 +8,6 @@ import fs from "fs";
 
 const uploadDir = "public/uploads/courses";
 
-
 export const getCourse = async (req, res) => {
   //   console.log(req);
 
@@ -132,24 +131,25 @@ export const postCourse = async (req, res) => {
 export const getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
-    const {preview} = req.query;
+    const { preview } = req.query;
     const imageUrl = process.env.APP_URL + "/uploads/courses/";
 
-    const course = await courseModel.findById(id)
-    .populate({
-      path: "category",
-      select: "name -_id"
-    })
-    .populate({
-      path: "details",
-      select: preview === 'true' ? "title type youtubeId text" : "title type"
-    });
+    const course = await courseModel
+      .findById(id)
+      .populate({
+        path: "category",
+        select: "name -_id",
+      })
+      .populate({
+        path: "details",
+        select: preview === "true" ? "title type youtubeId text" : "title type",
+      });
 
     return res.json({
       message: "Get course detail success",
       data: {
         ...course.toObject(),
-        thumbnail_url: imageUrl + course.thumbnail
+        thumbnail_url: imageUrl + course.thumbnail,
       },
     });
   } catch (error) {
@@ -362,12 +362,29 @@ export const deleteContentCourse = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await courseDetailModel.findByIdAndDelete(id)
+    await courseDetailModel.findByIdAndDelete(id);
 
     return res.status(200).json({
       message: "Delete content success",
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
+export const getDetailContentCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const content = await courseDetailModel.findById(id);
+
+    return res.status(200).json({
+      data: content,
+      message: "Get detail content course",
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
