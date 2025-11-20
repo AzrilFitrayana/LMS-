@@ -1,4 +1,44 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { mutateContentSchema } from "../../../utils/zodSchema";
+import { useNavigate, useParams } from "react-router-dom";
+import { createContent } from "../../../services/courseServices";
+
 const ManageContentCreatePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm({
+    resolver: zodResolver(mutateContentSchema),
+  });
+  const type = watch("type");
+
+  const { isLoading, mutateAsync } = useMutation({
+    mutationFn: (data) => createContent(data),
+  });
+
+  const onSubmit = async (values) => {
+    console.log(values);
+
+    try {
+      await mutateAsync({
+        ...values,
+        courseId: id,
+      });
+
+      navigate(`/manager/courses/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <div
@@ -35,7 +75,7 @@ const ManageContentCreatePage = () => {
         </div>
       </header>
       <form
-        action="manage-course-materi.html"
+        onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col w-[930px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
         <div className="flex flex-col gap-[10px]">
@@ -49,14 +89,19 @@ const ManageContentCreatePage = () => {
               alt="icon"
             />
             <input
+              {...register("title")}
               type="text"
               name="title"
               id="title"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Write better name for your course"
-              required=""
             />
           </div>
+          <span className="error-message text-[#FF435A]">
+            <span className="error-message text-[#FF435A]">
+              {errors?.title?.message}
+            </span>
+          </span>
         </div>
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="type" className="font-semibold">
@@ -69,6 +114,7 @@ const ManageContentCreatePage = () => {
               alt="icon"
             />
             <select
+              {...register("type")}
               name="type"
               id="type"
               className="appearance-none outline-none w-full py-3 px-2 -mx-2 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
@@ -76,9 +122,8 @@ const ManageContentCreatePage = () => {
               <option value="" hidden="">
                 Choose content type
               </option>
-              <option value="">test</option>
-              <option value="">test</option>
-              <option value="">test</option>
+              <option value="video">Video</option>
+              <option value="text">Text</option>
             </select>
             <img
               src="/assets/images/icons/arrow-down.svg"
@@ -87,41 +132,72 @@ const ManageContentCreatePage = () => {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-[10px]">
-          <label htmlFor="video" className="font-semibold">
-            Youtube Video ID
-          </label>
-          <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#662FFF]">
-            <img
-              src="/assets/images/icons/bill-black.svg"
-              className="w-6 h-6"
-              alt="icon"
-            />
-            <input
-              type="text"
-              name="video"
-              id="video"
-              className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
-              placeholder="Write tagline for better copy"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col gap-[10px]">
-          <label className="font-semibold">Content Text</label>
-          <textarea
-            className=" border border-[#CFDBEF] w-full rounded-lg appearance-none outline-none py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent p-6"
-            placeholder="Write your content text here"
-            required=""
-          ></textarea>
-        </div>
+        <span className="error-message text-[#FF435A]">
+          <span className="error-message text-[#FF435A]">
+            {errors?.type?.message}
+          </span>
+        </span>
+
+        {type === "video" && (
+          <>
+            <div className="flex flex-col gap-[10px]">
+              <label htmlFor="video" className="font-semibold">
+                Youtube Video ID
+              </label>
+              <div className="flex items-center w-full rounded-full border border-[#CFDBEF] gap-3 px-5 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#662FFF]">
+                <img
+                  src="/assets/images/icons/bill-black.svg"
+                  className="w-6 h-6"
+                  alt="icon"
+                />
+                <input
+                  {...register("youtubeId")}
+                  type="text"
+                  id="video"
+                  className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
+                  placeholder="Write tagline for better copy"
+                />
+              </div>
+            </div>
+            <span className="error-message text-[#FF435A]">
+              <span className="error-message text-[#FF435A]">
+                {errors?.youtubeId?.message}
+              </span>
+            </span>
+          </>
+        )}
+
+        {type === "text" && (
+          <>
+            <div className="flex flex-col gap-[10px]">
+              <label className="font-semibold">Content Text</label>
+              <textarea
+                {...register("text")}
+                onChange={(_, editor) => {
+                  const data = editor.getData();
+                  setValue("text", data);
+                }}
+                className=" border border-[#CFDBEF] w-full rounded-lg appearance-none outline-none py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent p-6"
+                placeholder="Write your content text here"
+              ></textarea>
+            </div>
+            <span className="error-message text-[#FF435A]">
+              <span className="error-message text-[#FF435A]">
+                {errors?.text?.message}
+              </span>
+            </span>
+          </>
+        )}
+
         <div className="flex items-center gap-[14px]">
           <button
-            type="submit"
+            type="button"
             className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
           >
             Save as Draft
           </button>
           <button
+            disabled={isLoading}
             type="submit"
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
