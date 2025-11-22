@@ -101,6 +101,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/manager/courses/:id/preview",
+        loader: async ({ params }) => {
+          const course = await getDetailCourse(params.id, true);
+
+          return course?.data;
+        },
         element: <CoursePreviewPage />,
       },
       {
