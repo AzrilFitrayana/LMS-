@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./utils/database.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
 
 const app = express();
 const port = 3000;
@@ -24,9 +25,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", globalRoutes);
-app.use('/api', paymentRoutes);
-app.use('/api', authRoutes);
-app.use('/api', courseRoutes);
+app.use("/api", paymentRoutes);
+app.use("/api", authRoutes);
+app.use("/api", courseRoutes);
+app.use("/api", studentRoutes);
 
 app.listen(port, () => {
   console.log(`BE server running at http://localhost:${port}`);
