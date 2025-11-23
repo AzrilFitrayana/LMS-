@@ -2,17 +2,29 @@ import fs from "fs";
 import bcrypt from "bcrypt";
 import userModel from "../models/userModel.js";
 import { mutateStudentSchema } from "../utils/schema.js";
+import path from "path";
 
 export const getStudent = async (req, res) => {
   try {
-    const students = await userModel.find({
-      role: "student",
-      manager: req.user._id,
+    const students = await userModel
+      .find({
+        role: "student",
+        manager: req.user._id,
+      })
+      .select("name course foto");
+
+    const fotoUrl = process.env.APP_URL + "/uploads/students/";
+
+    const response = students.map((std) => {
+      return {
+        ...std.toObject(),
+        foto_url: fotoUrl + std.foto,
+      };
     });
 
     return res.status(200).json({
       message: "Get Student Success",
-      data: students,
+      data: response,
     });
   } catch (error) {
     console.log(error);
@@ -57,6 +69,61 @@ export const postStudent = async (req, res) => {
     return res.status(200).json({
       message: "Post student success",
       data: response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const putStudent = async (req, res) => {
+  try {
+    const body = req.body;
+    const { id } = req.params;
+
+    const parse = mutateStudentSchema
+      .partial({ password: true })
+      .safeParse(body);
+
+    if (!parse.success) {
+      const errorMessage = parse.error.issues.map((err) => err.message);
+
+      // hapus gambar
+      if (req?.file?.path && fs.existsSync(req?.file?.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+
+      return res.status(400).json({
+        message: "Error Validation",
+        data: null,
+        errors: errorMessage,
+      });
+    }
+
+    const student = await userModel.findById(id);
+
+    const hashPassword = parse.data?.password
+      ? await bcrypt.hash(parse.data.password, 12)
+      : student.password;
+
+    await userModel.findByIdAndUpdate(id, {
+      name: parse.data.name,
+      email: parse.data.email,
+      password: hashPassword,
+      foto: req?.file ? req.file?.filename : student.foto,
+    });
+
+    // Jika ada file baru yang diupload DAN user sebelumnya punya foto
+    if (req?.file && student.foto) {
+      const oldPath = path.join("public/uploads/students/", student.foto);
+
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+    }
+
+    return res.status(200).json({
+      message: "Put student success",
     });
   } catch (error) {
     console.log(error);
