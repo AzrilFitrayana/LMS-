@@ -62,3 +62,8 @@ export const mutateStudentSchema = z.object({
     .any()
     .refine((file) => file?.name, { message: "Avatar is required" }),
 });
+
+export const mutateUpdateStudentSchema = mutateStudentSchema.omit({
+  password: true,
+  avatar: true,
+});

@@ -1,15 +1,22 @@
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { mutateStudentSchema } from "../../../utils/zodSchema";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
+import {
+  mutateStudentSchema,
+  mutateUpdateStudentSchema,
+} from "../../../utils/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createStudent } from "../../../services/studentServices";
+import {
+  createStudent,
+  updateStudent,
+} from "../../../services/studentServices";
 import { useMutation } from "@tanstack/react-query";
 
 const StudentCreatePage = () => {
   const [avatar, setAvatar] = useState(null);
   const fileInput = useRef(null);
   const navigate = useNavigate();
+  const student = useLoaderData();
 
   const {
     handleSubmit,
@@ -17,11 +24,21 @@ const StudentCreatePage = () => {
     formState: { errors },
     setValue,
   } = useForm({
-    resolver: zodResolver(mutateStudentSchema),
+    resolver: zodResolver(
+      student === undefined ? mutateStudentSchema : mutateUpdateStudentSchema
+    ),
+    defaultValues: {
+      name: student.name,
+      email: student.email,
+    },
   });
 
-  const { isLoading, mutateAsync } = useMutation({
+  const mutateCreateStudent = useMutation({
     mutationFn: (data) => createStudent(data),
+  });
+
+  const mutateEditStudent = useMutation({
+    mutationFn: (data) => updateStudent(data, student?._id),
   });
 
   const handleOnSubmit = async (values) => {
@@ -32,8 +49,11 @@ const StudentCreatePage = () => {
       formData.append("email", values.email);
       formData.append("password", values.password);
       formData.append("avatar", avatar);
-
-      await mutateAsync(formData);
+      if (student === undefined) {
+        await mutateCreateStudent.mutateAsync(formData);
+      } else {
+        await mutateEditStudent.mutateAsync(formData);
+      }
 
       navigate("/manager/students");
     } catch (error) {
@@ -46,13 +66,15 @@ const StudentCreatePage = () => {
       <header className="flex items-center justify-between gap-[30px]">
         <div>
           <h1 className="font-extrabold text-[28px] leading-[42px]">
-            Add Student
+            {student ? "Edit Student" : "Add Student"}
           </h1>
-          <p className="text-[#838C9D] mt-[1]">Create new future for company</p>
+          <p className="text-[#838C9D] mt-[1]">
+            {student ? "Edit student" : "Create new future for company"}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <Link
-            to=""
+            to="#"
             className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
           >
             Import from BWA
@@ -212,10 +234,14 @@ const StudentCreatePage = () => {
           </button>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={
+              student === undefined
+                ? mutateCreateStudent.isLoading
+                : mutateEditStudent.isLoading
+            }
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
-            Add Now
+            {student === undefined ? "Add" : "Update"} Now
           </button>
         </div>
       </form>

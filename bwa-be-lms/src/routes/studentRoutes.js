@@ -6,6 +6,7 @@ import { verifyToken } from "../middleware/verifyToken.js";
 import {
   deleteStudent,
   getStudent,
+  getStudentById,
   postStudent,
   putStudent,
 } from "../controller/studentController.js";
@@ -33,5 +34,7 @@ studentRoutes.put(
 );
 
 studentRoutes.delete("/students/:id", verifyToken, deleteStudent);
+
+studentRoutes.get("/students/:id", verifyToken, getStudentById);
 
 export default studentRoutes;
