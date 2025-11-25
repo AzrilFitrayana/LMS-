@@ -4,6 +4,7 @@ import { fileFilter } from "../utils/multer.js";
 import { fileStorage } from "../utils/multer.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import {
+  deleteStudent,
   getStudent,
   postStudent,
   putStudent,
@@ -16,6 +17,7 @@ const upload = multer({
 });
 
 studentRoutes.get("/students", verifyToken, getStudent);
+
 studentRoutes.post(
   "/students",
   verifyToken,
@@ -29,5 +31,7 @@ studentRoutes.put(
   upload.single("avatar"),
   putStudent
 );
+
+studentRoutes.delete("/students/:id", verifyToken, deleteStudent);
 
 export default studentRoutes;

@@ -7,8 +7,10 @@ import { signinSchema } from "../../utils/zodSchema";
 import { useMutation } from "@tanstack/react-query";
 import { postSignIn } from "../../services/authServices";
 import { STORAGE_KEY } from "../../utils/const";
+import { useState } from "react";
 
 const SigninPage = () => {
+  const [error, setError] = useState(null);
   const {
     register,
     handleSubmit,
@@ -37,6 +39,7 @@ const SigninPage = () => {
         navigate("/student");
       }
     } catch (error) {
+      setError(error.response.data.message);
       console.log(error);
     }
   };
@@ -76,6 +79,7 @@ const SigninPage = () => {
           <p className="text-[#6B6C7F]">Manage your employees easily</p>
         </div>
         <hr className="border-[#262A56]" />
+        {error && <p className="text-red-500 text-xs mt-2 ml-2">{error}</p>}
         <div className="flex items-center gap-3 w-full rounded-full border p-[14px_20px] transition-all duration-300 focus-within:border-[#8661EE] focus-within:shadow-[-10px_-6px_10px_0_#7F33FF_inset] bg-[#070B24] border-[#24283E] shadow-[-10px_-6px_10px_0_#181A35_inset]">
           <img
             src="/assets/images/icons/sms-white.svg"

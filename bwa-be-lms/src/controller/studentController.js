@@ -1,17 +1,17 @@
 import fs from "fs";
+import path from "path";
 import bcrypt from "bcrypt";
 import userModel from "../models/userModel.js";
+import courseModel from "../models/courseModel.js";
 import { mutateStudentSchema } from "../utils/schema.js";
-import path from "path";
 
 export const getStudent = async (req, res) => {
   try {
-    const students = await userModel
-      .find({
-        role: "student",
-        manager: req.user._id,
-      })
-      .select("name course foto");
+    const students = await userModel.find({
+      role: "student",
+      manager: req.user._id,
+    });
+    // .select("name course foto");
 
     const fotoUrl = process.env.APP_URL + "/uploads/students/";
 
@@ -124,6 +124,52 @@ export const putStudent = async (req, res) => {
 
     return res.status(200).json({
       message: "Put student success",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const deleteStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await courseModel.findOneAndUpdate(
+      {
+        student: { $in: id },
+      },
+      {
+        $pull: {
+          student: id,
+        },
+      }
+    );
+
+    const studentImage = await userModel.findById(id);
+
+    const dirname = path.resolve();
+    // console.log("dirname", dirname);
+    // dirname D:\bwa\LMS-BWA\bwa-be-lms
+
+    const filePath = path.join(
+      dirname,
+      "public/uploads/students",
+      studentImage.foto
+    );
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    const student = await userModel.findByIdAndDelete(id);
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    return res.status(200).json({
+      message: "Delete student success",
     });
   } catch (error) {
     console.log(error);
