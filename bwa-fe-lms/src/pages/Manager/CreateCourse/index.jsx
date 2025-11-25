@@ -2,7 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLoaderData, useNavigate, useParams } from "react-router-dom";
-import { createCourseSchema, updateCourseSchema } from "../../../utils/zodSchema";
+import {
+  createCourseSchema,
+  updateCourseSchema,
+} from "../../../utils/zodSchema";
 import { useMutation } from "@tanstack/react-query";
 import { createCourse, updateCourse } from "../../../services/courseServices";
 
@@ -22,7 +25,9 @@ const CreateCourse = () => {
     formState: { errors },
     setValue,
   } = useForm({
-    resolver: zodResolver(data.course === null ? createCourseSchema : updateCourseSchema),
+    resolver: zodResolver(
+      data.course === null ? createCourseSchema : updateCourseSchema
+    ),
     defaultValues: {
       name: data?.course?.name,
       tagline: data?.course?.tagline,
@@ -145,7 +150,13 @@ const CreateCourse = () => {
             <button
               type="button"
               id="delete-preview"
-              className="absolute right-[10px] bottom-[10px] w-12 h-12 rounded-full z-10 hidden"
+              onClick={() => {
+                setFile(null);
+                setValue("thumbnail", null);
+              }}
+              className={`absolute right-[10px] bottom-[10px] w-12 h-12 rounded-full z-10 ${
+                file !== null ? "block" : "hidden"
+              }`}
             >
               <img src="/assets/images/icons/delete.svg" alt="delete" />
             </button>
@@ -261,10 +272,14 @@ const CreateCourse = () => {
           </button>
           <button
             type="submit"
-            disabled={data.course === null ? mutateCreate.isLoading : mutateUpdate.isLoading}
+            disabled={
+              data.course === null
+                ? mutateCreate.isLoading
+                : mutateUpdate.isLoading
+            }
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
-            {data.course === null ? 'Create Now' : 'Update Now'}
+            {data.course === null ? "Create Now" : "Update Now"}
           </button>
         </div>
       </form>

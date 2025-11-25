@@ -1,19 +1,44 @@
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { mutateStudentSchema } from "../../../utils/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createStudent } from "../../../services/studentServices";
+import { useMutation } from "@tanstack/react-query";
 
 const StudentCreatePage = () => {
   const [avatar, setAvatar] = useState(null);
   const fileInput = useRef(null);
+  const navigate = useNavigate();
 
-  const { handleSubmit, register } = useForm({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setValue,
+  } = useForm({
     resolver: zodResolver(mutateStudentSchema),
   });
 
-  const handleOnSubmit = (values) => {
-    console.log(values);
+  const { isLoading, mutateAsync } = useMutation({
+    mutationFn: (data) => createStudent(data),
+  });
+
+  const handleOnSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("avatar", avatar);
+
+      await mutateAsync(formData);
+
+      navigate("/manager/students");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -39,12 +64,12 @@ const StudentCreatePage = () => {
         className="flex flex-col w-[550px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
         <div className="relative flex flex-col gap-[10px]">
-          <label htmlFor="thumbnail" className="font-semibold">
+          <label htmlFor="avatar" className="font-semibold">
             Add a Avatar
           </label>
           <div className="flex items-center gap-[14px]">
             <div
-              id="thumbnail-preview-container"
+              id="avatar-preview-container"
               className="relative flex shrink-0 w-20 h-20 rounded-[20px] border border-[#CFDBEF] overflow-hidden"
             >
               <button
@@ -60,18 +85,24 @@ const StudentCreatePage = () => {
                 />
               </button>
               <img
-                id="thumbnail-preview"
+                id="avatar-preview"
                 src={avatar !== null ? URL.createObjectURL(avatar) : ""}
                 className={`w-full h-full object-cover ${
-                  avatar !== null ? "" : "hidden"
+                  avatar !== null ? "block" : "hidden"
                 }`}
-                alt="thumbnail"
+                alt="avatar"
               />
             </div>
             <button
               type="button"
               id="delete-preview"
-              className="w-12 h-12 rounded-full z-10 hidden"
+              onClick={() => {
+                setAvatar(null);
+                setValue("avatar", null);
+              }}
+              className={`w-12 h-12 rounded-full z-10 ${
+                avatar !== null ? "block" : "hidden"
+              }`}
             >
               <img src="/assets/images/icons/delete.svg" alt="delete" />
             </button>
@@ -86,12 +117,17 @@ const StudentCreatePage = () => {
               }
             }}
             type="file"
-            name="avatar"
             id="avatar"
             accept="image/*"
             className="absolute bottom-0 left-1/4 -z-10"
           />
         </div>
+        <span className="error-message text-[#FF435A]">
+          <span className="error-message text-[#FF435A]">
+            {errors?.avatar?.message}
+          </span>
+        </span>
+
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="name" className="font-semibold">
             Full Name
@@ -105,13 +141,18 @@ const StudentCreatePage = () => {
             <input
               {...register("name")}
               type="text"
-              name="name"
               id="name"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Write your name"
             />
           </div>
         </div>
+        <span className="error-message text-[#FF435A]">
+          <span className="error-message text-[#FF435A]">
+            {errors?.name?.message}
+          </span>
+        </span>
+
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="email" className="font-semibold">
             Email Address
@@ -125,13 +166,18 @@ const StudentCreatePage = () => {
             <input
               {...register("email")}
               type="email"
-              name="email"
               id="email"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Write your email address"
             />
           </div>
         </div>
+        <span className="error-message text-[#FF435A]">
+          <span className="error-message text-[#FF435A]">
+            {errors?.email?.message}
+          </span>
+        </span>
+
         <div className="flex flex-col gap-[10px]">
           <label htmlFor="password" className="font-semibold">
             Password
@@ -145,13 +191,18 @@ const StudentCreatePage = () => {
             <input
               {...register("password")}
               type="password"
-              name="password"
               id="password"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Type password"
             />
           </div>
         </div>
+        <span className="error-message text-[#FF435A]">
+          <span className="error-message text-[#FF435A]">
+            {errors?.password?.message}
+          </span>
+        </span>
+
         <div className="flex items-center gap-[14px]">
           <button
             type="button"
@@ -161,6 +212,7 @@ const StudentCreatePage = () => {
           </button>
           <button
             type="submit"
+            disabled={isLoading}
             className="w-full rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
             Add Now
