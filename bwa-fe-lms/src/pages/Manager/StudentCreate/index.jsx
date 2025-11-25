@@ -28,8 +28,8 @@ const StudentCreatePage = () => {
       student === undefined ? mutateStudentSchema : mutateUpdateStudentSchema
     ),
     defaultValues: {
-      name: student.name,
-      email: student.email,
+      name: student?.name,
+      email: student?.email,
     },
   });
 

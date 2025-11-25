@@ -19,3 +19,6 @@ export const updateStudent = async (data, id) =>
       headers: { "Content-Type": "multipart/form-data" },
     })
     .then((res) => res.data);
+
+export const deleteStudent = async (id) =>
+  apiInstanceAuth.delete(`/students/${id}`).then((res) => res.data);
