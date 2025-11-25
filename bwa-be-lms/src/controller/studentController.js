@@ -7,11 +7,12 @@ import { mutateStudentSchema } from "../utils/schema.js";
 
 export const getStudent = async (req, res) => {
   try {
-    const students = await userModel.find({
-      role: "student",
-      manager: req.user._id,
-    });
-    // .select("name course foto");
+    const students = await userModel
+      .find({
+        role: "student",
+        manager: req.user._id,
+      })
+      .select("name course foto");
 
     const fotoUrl = process.env.APP_URL + "/uploads/students/";
 

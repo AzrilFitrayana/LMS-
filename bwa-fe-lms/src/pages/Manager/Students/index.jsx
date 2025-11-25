@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import StudentItem from "./StudentItem";
 
 const StudentsPage = () => {
+  const data = useLoaderData();
+
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -32,7 +34,15 @@ const StudentsPage = () => {
         id="CourseList"
         className="flex flex-col w-full rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
       >
-        <StudentItem />
+        {data.map((item) => (
+          <StudentItem
+            key={item._id}
+            id={item._id}
+            imageUrl={item.foto_url}
+            name={item.name}
+            totalCourse={item.course.length}
+          />
+        ))}
 
         <div id="Pagination" className="flex items-center gap-3">
           <button

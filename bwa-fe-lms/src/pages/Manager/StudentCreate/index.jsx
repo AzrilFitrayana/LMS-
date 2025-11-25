@@ -1,6 +1,21 @@
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { mutateStudentSchema } from "../../../utils/zodSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const StudentCreatePage = () => {
+  const [avatar, setAvatar] = useState(null);
+  const fileInput = useRef(null);
+
+  const { handleSubmit, register } = useForm({
+    resolver: zodResolver(mutateStudentSchema),
+  });
+
+  const handleOnSubmit = (values) => {
+    console.log(values);
+  };
+
   return (
     <>
       <header className="flex items-center justify-between gap-[30px]">
@@ -19,7 +34,10 @@ const StudentCreatePage = () => {
           </Link>
         </div>
       </header>
-      <form className="flex flex-col w-[550px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]">
+      <form
+        onSubmit={handleSubmit(handleOnSubmit)}
+        className="flex flex-col w-[550px] rounded-[30px] p-[30px] gap-[30px] bg-[#F8FAFB]"
+      >
         <div className="relative flex flex-col gap-[10px]">
           <label htmlFor="thumbnail" className="font-semibold">
             Add a Avatar
@@ -33,6 +51,7 @@ const StudentCreatePage = () => {
                 type="button"
                 id="trigger-input"
                 className="absolute top-0 left-0 w-full h-full flex justify-center items-center gap-3 z-0"
+                onClick={() => fileInput?.current?.click()}
               >
                 <img
                   src="/assets/images/icons/gallery-add-black.svg"
@@ -42,8 +61,10 @@ const StudentCreatePage = () => {
               </button>
               <img
                 id="thumbnail-preview"
-                src=""
-                className="w-full h-full object-cover hidden"
+                src={avatar !== null ? URL.createObjectURL(avatar) : ""}
+                className={`w-full h-full object-cover ${
+                  avatar !== null ? "" : "hidden"
+                }`}
                 alt="thumbnail"
               />
             </div>
@@ -56,12 +77,19 @@ const StudentCreatePage = () => {
             </button>
           </div>
           <input
+            {...register("avatar")}
+            ref={fileInput}
+            onChange={(e) => {
+              if (e.target.files) {
+                setAvatar(e.target.files[0]);
+                setValue("avatar", e.target.files[0]);
+              }
+            }}
             type="file"
-            name="thumbnail"
-            id="thumbnail"
+            name="avatar"
+            id="avatar"
             accept="image/*"
             className="absolute bottom-0 left-1/4 -z-10"
-            required=""
           />
         </div>
         <div className="flex flex-col gap-[10px]">
@@ -75,12 +103,12 @@ const StudentCreatePage = () => {
               alt="icon"
             />
             <input
+              {...register("name")}
               type="text"
               name="name"
               id="name"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Write your name"
-              required=""
             />
           </div>
         </div>
@@ -95,12 +123,12 @@ const StudentCreatePage = () => {
               alt="icon"
             />
             <input
+              {...register("email")}
               type="email"
               name="email"
               id="email"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Write your email address"
-              required=""
             />
           </div>
         </div>
@@ -115,18 +143,18 @@ const StudentCreatePage = () => {
               alt="icon"
             />
             <input
+              {...register("password")}
               type="password"
               name="password"
               id="password"
               className="appearance-none outline-none w-full py-3 font-semibold placeholder:font-normal placeholder:text-[#838C9D] !bg-transparent"
               placeholder="Type password"
-              required=""
             />
           </div>
         </div>
         <div className="flex items-center gap-[14px]">
           <button
-            type="submit"
+            type="button"
             className="w-full rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
           >
             Save as Draft
