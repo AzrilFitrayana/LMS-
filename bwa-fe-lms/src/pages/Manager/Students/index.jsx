@@ -21,7 +21,7 @@ const StudentsPage = () => {
             Import File
           </Link>
           <Link
-            to="create-new-student.html"
+            to="/manager/students/create"
             className="w-fit rounded-full p-[14px_20px] font-semibold text-[#FFFFFF] bg-[#662FFF] text-nowrap"
           >
             Add Student

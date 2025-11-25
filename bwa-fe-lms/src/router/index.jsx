@@ -12,6 +12,7 @@ import CoursePreviewPage from "../pages/Manager/CoursePreview";
 import StudentsPage from "../pages/Manager/Students";
 import StudentPage from "../pages/Student";
 import secureLocalStorage from "react-secure-storage";
+import StudentCreatePage from "../pages/Manager/StudentCreate";
 import { MANAGER_SESSION, STORAGE_KEY } from "../utils/const";
 import {
   detailContent,
@@ -109,8 +110,12 @@ const router = createBrowserRouter([
         element: <CoursePreviewPage />,
       },
       {
-        path: "/manager/students/create",
+        path: "/manager/students",
         element: <StudentsPage />,
+      },
+      {
+        path: "/manager/students/create",
+        element: <StudentCreatePage />,
       },
     ],
   },
