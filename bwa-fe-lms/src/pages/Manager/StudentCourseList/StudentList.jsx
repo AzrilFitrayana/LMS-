@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link, useRevalidator } from "react-router-dom";
+import { Link, useParams, useRevalidator } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
-import { deleteStudent } from "../../../services/studentServices";
+import { deleteStudentToCourse } from "../../../services/courseServices";
 
 const StudentList = ({
   id = 1,
@@ -10,23 +10,24 @@ const StudentList = ({
   name = "Angga Risky Setiawan",
   email = "angga@gmail.com",
 }) => {
-  // const [error, setError] = useState(null);
-  // const revalidator = useRevalidator();
+  const [error, setError] = useState(null);
+  const revalidator = useRevalidator();
+  const params = useParams();
 
-  // const { isLoading, mutateAsync } = useMutation({
-  //   mutationFn: () => deleteStudent(id),
-  //   onSuccess: () => {
-  //     revalidator.revalidate();
-  //   },
-  //   onError: () => {
-  //     setError("Failed to delete student");
-  //     alert(error);
-  //   },
-  // });
+  const { isLoading, mutateAsync } = useMutation({
+    mutationFn: () => deleteStudentToCourse({ studentId: id }, params.id),
+    onSuccess: () => {
+      revalidator.revalidate();
+    },
+    onError: () => {
+      setError("Failed to delete student");
+      alert(error);
+    },
+  });
 
-  // const handleDelete = async () => {
-  //   await mutateAsync();
-  // };
+  const handleDelete = async () => {
+    await mutateAsync();
+  };
 
   return (
     <div className="card flex items-center gap-5">
@@ -57,9 +58,9 @@ const StudentList = ({
       </div>
       <div className="flex justify-end items-center gap-3">
         <button
-          // onClick={() => handleDelete(id)}
+          onClick={() => handleDelete()}
           type="button"
-          // disabled={isLoading}
+          disabled={isLoading}
           className="w-fit rounded-full p-[14px_20px] bg-[#FF435A] font-semibold text-white text-nowrap"
         >
           Delete

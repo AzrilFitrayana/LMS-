@@ -49,3 +49,6 @@ export const getStudentByCourse = async (id) =>
 
 export const addStudentToCourse = async (data, id) =>
   apiInstanceAuth.post(`/courses/students/${id}`, data).then((res) => res.data);
+
+export const deleteStudentToCourse = async (data, id) =>
+  apiInstanceAuth.put(`/courses/students/${id}`, data).then((res) => res.data);
