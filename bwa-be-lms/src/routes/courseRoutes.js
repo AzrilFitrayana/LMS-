@@ -1,6 +1,7 @@
 import {
   deleteContentCourse,
   deleteCourse,
+  deleteStudentToCourse,
   getCategories,
   getCourse,
   getCourseById,
@@ -70,6 +71,12 @@ courseRoutes.post(
   verifyToken,
   validateRequest(mutateStudentToCourseSchema),
   postStudentToCourse
+);
+courseRoutes.put(
+  `/courses/students/:id`,
+  verifyToken,
+  validateRequest(mutateStudentToCourseSchema),
+  deleteStudentToCourse
 );
 
 export default courseRoutes;

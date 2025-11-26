@@ -445,3 +445,31 @@ export const postStudentToCourse = async (req, res) => {
     });
   }
 };
+
+export const deleteStudentToCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+
+    await userModel.findByIdAndUpdate(body.studentId, {
+      $pull: {
+        course: id,
+      },
+    });
+
+    await courseModel.findByIdAndUpdate(id, {
+      $pull: {
+        student: body.studentId,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Delete student to course success",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
