@@ -19,7 +19,7 @@ const CardCourse = ({
   const handleDelete = async () => {
     try {
       await mutateAsync();
-      
+
       revalidator.revalidate();
     } catch (error) {
       console.log(error);
@@ -67,6 +67,12 @@ const CardCourse = ({
           className="w-fit rounded-full border border-[#060A23] p-[14px_20px] font-semibold text-nowrap"
         >
           Manage
+        </Link>
+        <Link
+          to={`/manager/courses/students/${id}`}
+          className="w-fit rounded-full p-[14px_20px] font-semibold text-nowrap bg-[#060A23] text-white"
+        >
+          Detail Student
         </Link>
         <button
           type="button"

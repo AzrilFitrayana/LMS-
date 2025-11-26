@@ -399,16 +399,28 @@ export const getStudentByCourseId = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const imageUrl = process.env.APP_URL + "/uploads/students/";
+
     const course = await courseModel.findById(id).select("name").populate({
       path: "student",
-      select: "name email photo",
+      select: "name email foto",
+    });
+
+    const studentsMap = course.student.map((item) => {
+      return {
+        ...item.toObject(),
+        foto_url: imageUrl + item.foto,
+      };
     });
 
     // console.log(course);
 
     return res.status(200).json({
       message: "Get student by course success",
-      data: course,
+      data: {
+        ...course.toObject(),
+        student: studentsMap,
+      },
     });
   } catch (error) {
     console.log(error);
