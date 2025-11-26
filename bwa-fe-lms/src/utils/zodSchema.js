@@ -67,3 +67,7 @@ export const mutateUpdateStudentSchema = mutateStudentSchema.omit({
   password: true,
   avatar: true,
 });
+
+export const mutateStudentToCourseSchema = z.object({
+  studentId: z.string().min(5),
+});

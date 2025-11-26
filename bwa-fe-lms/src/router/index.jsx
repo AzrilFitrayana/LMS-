@@ -23,6 +23,7 @@ import {
 } from "../services/courseServices";
 import { getStudent, getStudentById } from "../services/studentServices";
 import StudentCourseList from "../pages/Manager/StudentCourseList";
+import StudentCreateForm from "../pages/Manager/StudentCourseList/StudentCreateForm";
 
 const router = createBrowserRouter([
   { path: "/", element: <ManagerHomePage /> },
@@ -140,11 +141,18 @@ const router = createBrowserRouter([
         loader: async ({ params }) => {
           const students = await getStudentByCourse(params.id);
 
-          // console.log(students);
-
           return students?.data;
         },
         element: <StudentCourseList />,
+      },
+      {
+        path: "/manager/courses/students/:id/add",
+        loader: async () => {
+          const students = await getStudent();
+
+          return students?.data;
+        },
+        element: <StudentCreateForm />,
       },
     ],
   },
