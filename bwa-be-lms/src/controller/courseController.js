@@ -392,3 +392,28 @@ export const getDetailContentCourse = async (req, res) => {
     });
   }
 };
+
+// Student
+
+export const getStudentByCourseId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const course = await courseModel.findById(id).select("name").populate({
+      path: "student",
+      select: "name email photo",
+    });
+
+    // console.log(course);
+
+    return res.status(200).json({
+      message: "Get student by course success",
+      data: course,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
