@@ -52,7 +52,8 @@ courseModel.post("findOneAndDelete", async (doc) => {
       },
     });
 
-    await courseDetailModel.deleteMany({//one to many
+    await courseDetailModel.deleteMany({
+      //one to many
       course: doc._id,
     });
 
