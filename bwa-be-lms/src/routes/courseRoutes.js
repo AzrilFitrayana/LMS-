@@ -8,13 +8,17 @@ import {
   getStudentByCourseId,
   postContentCourse,
   postCourse,
+  postStudentToCourse,
   updateContentCourse,
   updateCourse,
 } from "../controller/courseController.js";
 import { validateRequest } from "../middleware/validateRequest.js";
 import { fileStorageCourse, fileFilter } from "../utils/multer.js";
 import { verifyToken } from "../middleware/verifyToken.js";
-import { mutateContentSchema } from "../utils/schema.js";
+import {
+  mutateContentSchema,
+  mutateStudentToCourseSchema,
+} from "../utils/schema.js";
 import express from "express";
 import multer from "multer";
 
@@ -61,5 +65,11 @@ courseRoutes.get("/courses/contents/:id", verifyToken, getDetailContentCourse);
 
 // student
 courseRoutes.get(`/courses/students/:id`, verifyToken, getStudentByCourseId);
+courseRoutes.post(
+  `/courses/students/:id`,
+  verifyToken,
+  validateRequest(mutateStudentToCourseSchema),
+  postStudentToCourse
+);
 
 export default courseRoutes;

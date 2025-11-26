@@ -417,3 +417,31 @@ export const getStudentByCourseId = async (req, res) => {
     });
   }
 };
+
+export const postStudentToCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+
+    await userModel.findByIdAndUpdate(body.studentId, {
+      $push: {
+        course: id,
+      },
+    });
+
+    await courseModel.findByIdAndUpdate(id, {
+      $push: {
+        student: body.studentId,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Post student to course success",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

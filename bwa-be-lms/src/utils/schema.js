@@ -28,3 +28,7 @@ export const mutateStudentSchema = z.object({
   email: z.email(),
   password: z.string().min(5),
 });
+
+export const mutateStudentToCourseSchema = z.object({
+  studentId: z.string().min(5),
+});
