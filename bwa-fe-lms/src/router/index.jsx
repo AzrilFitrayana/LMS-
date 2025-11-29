@@ -24,18 +24,42 @@ import {
 import { getStudent, getStudentById } from "../services/studentServices";
 import StudentCourseList from "../pages/Manager/StudentCourseList";
 import StudentCreateForm from "../pages/Manager/StudentCourseList/StudentCreateForm";
+import { getOverviewServices } from "../services/overviewServices";
 
 const router = createBrowserRouter([
   { path: "/", element: <ManagerHomePage /> },
-  { path: "/manager/sign-in", element: <SigninPage /> },
-  { path: "/manager/sign-up", element: <SignupPage /> },
+  {
+    path: "/manager/sign-in",
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      if (session && session.role === "manager") {
+        throw redirect("/manager");
+      }
+
+      return true;
+    },
+    element: <SigninPage />,
+  },
+  {
+    path: "/manager/sign-up",
+    loader: async () => {
+      const session = secureLocalStorage.getItem(STORAGE_KEY);
+
+      if (session && session.role === "manager") {
+        throw redirect("/manager");
+      }
+
+      return true;
+    },
+    element: <SignupPage />,
+  },
   { path: "/manager/success-checkout", element: <SuccessCheckoutPage /> },
   {
     path: "/manager",
     id: MANAGER_SESSION,
     loader: async () => {
       const session = secureLocalStorage.getItem(STORAGE_KEY);
-      // console.log(session)
 
       if (!session || session.role !== "manager") {
         throw redirect("/manager/sign-in");
@@ -47,6 +71,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        loader: async () => {
+          const overview = await getOverviewServices();
+
+          return overview?.data;
+        },
         element: <ManagerHomePage />,
       },
       {

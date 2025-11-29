@@ -4,7 +4,8 @@ import userModel from "../models/userModel.js";
 export const verifyToken = async (req, res, next) => {
   const secretKey = process.env.SECRET_KEY ?? "";
 
-  if (req.headers?.authorization?.split(" ")[0] === "JWT") { //apakah ada teks JWT
+  if (req.headers?.authorization?.split(" ")[0] === "JWT") {
+    //apakah ada teks JWT
     const decode = jwt.verify(
       req.headers?.authorization?.split(" ")[1], //Memisahkan berdasarkan spasi dan Mengambil bagian kedua setelah dipisah
       secretKey
